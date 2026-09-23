@@ -6,9 +6,10 @@ import { Room } from './entities/room.entity';
 import { Player } from './entities/player.entity';
 import { Round } from './entities/round.entity';
 import { Vote } from './entities/vote.entity';
+import { GameService } from './game.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Player, Room, RoomPlayer, Round, Vote])],
-  providers: [GameGateway],
+  providers: [GameGateway, GameService],
 })
 export class GameModule {}

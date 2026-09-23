@@ -88,4 +88,8 @@ export class GameService {
   leaveQueue(socketId: string) {
     this.queue = this.queue.filter((p) => p.socketId !== socketId);
   }
+
+  getQueueSocketIds(): string[] {
+    return this.queue.map((p) => p.socketId);
+  }
 }
