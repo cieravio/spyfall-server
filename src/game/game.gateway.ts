@@ -52,6 +52,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const { roomId, code, players, spySocketIds } = result;
 
+    const { round, commonWord, spyWord } = await this.gameService.generateRound(
+      roomId,
+      1,
+    );
+
     for (const p of players) {
       const playerSocket = this.server.sockets.sockets.get(p.socketId);
       if (playerSocket) {
@@ -66,6 +71,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             socketId: p1.socketId,
             username: p1.username,
           })),
+        });
+
+        playerSocket.emit('round_started', {
+          roundId: round.id,
+          roundNumber: 1,
+          word: isSpy ? spyWord : commonWord,
         });
       }
     }

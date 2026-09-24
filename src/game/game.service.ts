@@ -4,6 +4,8 @@ import { Room } from './entities/room.entity';
 import { Repository } from 'typeorm';
 import { Player } from './entities/player.entity';
 import { RoomPlayer } from './entities/room-player.entity';
+import { WordPair } from './entities/word-pair.entity';
+import { Round } from './entities/round.entity';
 
 @Injectable()
 export class GameService {
@@ -16,6 +18,10 @@ export class GameService {
     private playerRepository: Repository<Player>,
     @InjectRepository(RoomPlayer)
     private roomPlayerRepository: Repository<RoomPlayer>,
+    @InjectRepository(Round)
+    private roundRepository: Repository<Round>,
+    @InjectRepository(WordPair)
+    private wordPairRepository: Repository<WordPair>,
   ) {}
 
   async joinQueue(socketId: string, username: string) {
@@ -91,5 +97,36 @@ export class GameService {
 
   getQueueSocketIds(): string[] {
     return this.queue.map((p) => p.socketId);
+  }
+
+  async generateRound(
+    roomId: string,
+    roundNumber: number,
+  ): Promise<{
+    round: Round;
+    commonWord: string;
+    spyWord: string;
+  }> {
+    const pairs = await this.wordPairRepository.find();
+    if (!pairs.length) throw new Error('No word pairs found');
+
+    const pair = pairs[Math.floor(Math.random() * pairs.length)];
+
+    const coinFlip = Math.random() < 0.5;
+    const commonWord = coinFlip ? pair.wordA : pair.wordB;
+    const spyWord = coinFlip ? pair.wordB : pair.wordA;
+
+    const room = await this.roomRepository.findOne({ where: { id: roomId } });
+    if (!room) throw new Error('Room not found');
+
+    const round = this.roundRepository.create({
+      room,
+      roundNumber,
+      word: commonWord,
+      spyWord: spyWord,
+    });
+    await this.roundRepository.save(round);
+
+    return { round, commonWord, spyWord };
   }
 }

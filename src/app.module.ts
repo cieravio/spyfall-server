@@ -9,6 +9,7 @@ import { Room } from './game/entities/room.entity';
 import { RoomPlayer } from './game/entities/room-player.entity';
 import { Round } from './game/entities/round.entity';
 import { Vote } from './game/entities/vote.entity';
+import { WordPair } from './game/entities/word-pair.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { Vote } from './game/entities/vote.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [Player, Room, RoomPlayer, Round, Vote],
+        entities: [Player, Room, RoomPlayer, Round, Vote, WordPair],
         synchronize: true, // dont forget to turn off in prod
         logging: true,
       }),
