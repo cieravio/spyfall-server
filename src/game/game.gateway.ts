@@ -82,4 +82,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
   }
+
+  @SubscribeMessage('send_message')
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: { roomId: string; message: string; username: string },
+  ) {
+    this.server.to(payload.roomId).emit('new_message', {
+      username: payload.username,
+      message: payload.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 }
